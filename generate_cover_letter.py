@@ -185,6 +185,9 @@ def extract_technical_requirements(job_description):
 
 def generate_cover_letter(job_description, relevant_experience, requirements):
     """Generate a cover letter using OpenAI's GPT model with extracted requirements."""
+    # Get name from knowledge base
+    name = knowledge_base.get('PersonalInfo', {}).get('Name', 'Candidate')
+    
     prompt = f"""
     Job Description:
     {job_description}
@@ -197,12 +200,12 @@ def generate_cover_letter(job_description, relevant_experience, requirements):
     Relevant information about me:
     {relevant_experience}
 
-    My name: Niteeq Sheik
+    My name: {name}
 
     Please write a professional cover letter following these specific guidelines:
 
     1. Opening Paragraph:
-    - Use my name (Niteeq Sheik) in the signature
+    - Use my name ({name}) in the signature
     - Show genuine enthusiasm for the specific role and company
     - Mention how you learned about the position
     - Include a brief overview of your relevant technical background, specifically mentioning experience with {', '.join(requirements['technical_skills'][:3])}
@@ -219,7 +222,7 @@ def generate_cover_letter(job_description, relevant_experience, requirements):
     - Reiterate your interest and fit for the role
     - Include a call to action
     - Thank the reader for their time
-    - End with a proper signature using my name (Niteeq Sheik)
+    - End with a proper signature using my name ({name})
 
     Additional Requirements:
     - Keep the letter concise (around 400 words)
