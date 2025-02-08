@@ -46,11 +46,12 @@ def get_embedding(text):
     """
     EMBEDDING_MODEL = "text-embedding-ada-002"  # 1536 dimensions typically
 
-    response = openai.Embedding.create(
-        input=[text],
-        model=EMBEDDING_MODEL
+    response = openai.embeddings.create(
+        model=EMBEDDING_MODEL,
+        input=[text]
     )
-    embedding = response['data'][0]['embedding']
+    # Access the embedding directly from the response object
+    embedding = response.data[0].embedding
     return np.array(embedding, dtype=np.float32)
 
 def create_faiss_index(embeddings):
