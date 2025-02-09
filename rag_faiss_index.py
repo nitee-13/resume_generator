@@ -17,25 +17,36 @@ def load_json(file_path):
 def json_to_chunks(data, parent_key=""):
     """
     Recursively traverse the JSON structure and create (text, metadata) pairs.
+    Creates more contextual chunks for better retrieval.
     """
     chunks = []
 
     if isinstance(data, dict):
+        # Create a combined chunk for dictionary entries
+        combined_text = []
         for key, value in data.items():
             new_key = f"{parent_key}.{key}" if parent_key else key
-            # Recurse
-            chunks.extend(json_to_chunks(value, parent_key=new_key))
+            
+            # Handle primitive values directly
+            if isinstance(value, (str, int, float, bool)):
+                combined_text.append(f"{key}: {value}")
+            elif isinstance(value, list) and all(isinstance(x, str) for x in value):
+                # Handle lists of strings (like skills, coursework) as a single entry
+                combined_text.append(f"{key}: {', '.join(value)}")
+            else:
+                # Recurse for nested structures
+                chunks.extend(json_to_chunks(value, parent_key=new_key))
+        
+        if combined_text:
+            text_chunk = " | ".join(combined_text)
+            metadata = {"source": parent_key}
+            chunks.append((text_chunk, metadata))
 
     elif isinstance(data, list):
+        # Handle each list item separately
         for idx, item in enumerate(data):
             new_key = f"{parent_key}[{idx}]"
             chunks.extend(json_to_chunks(item, parent_key=new_key))
-
-    else:
-        # Base case: data is a string or other primitive, create a chunk
-        text_chunk = f"{parent_key}: {data}"
-        metadata = {"source": parent_key}
-        chunks.append((text_chunk, metadata))
 
     return chunks
 
